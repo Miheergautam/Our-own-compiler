@@ -1,0 +1,114 @@
+start: _statement_list
+
+_statement_list: _statement+
+
+_statement: declaration_statement 
+          | assignment_statement
+          | array_assignment_statement
+          | conditional_statement
+          | loop_statement
+          | function_declaration
+          | function_call
+          | input_statement
+          | output_statement
+          | try_catch_statement
+          | COMMENT
+          | return_statement
+          | carryon_statement
+          | stop_statement
+                 
+declaration_statement: "var" IDENTIFIER ":" _var_type ";" 
+                     | "array" IDENTIFIER "[" NUMBER "]" ":"
+
+assignment_statement: IDENTIFIER EQUALS expression ";"
+array_assignment_statement: IDENTIFIER "[" expression "]" EQUALS expression ";"
+
+EQUALS: "="
+
+_var_type: NUM 
+        | STR 
+        | BOOL
+
+NUM: "num" 
+STR: "str"
+BOOL: "bool"
+
+expression: _term 
+              | expression PLUS _term 
+              | expression MINUS _term
+              | expression GREATER_THAN _term
+              | expression LESS_THAN _term
+              | expression GREATER_THAN_EQUALTO _term
+              | expression LESS_THAN_EQUALTO _term
+              | expression EQUALS_TO _term
+              | expression NOT_EQUALS _term
+              | expression AND _term
+              | expression OR _term
+              | IDENTIFIER "(" expression ")"
+
+PLUS:"+"
+GREATER_THAN:">"
+LESS_THAN:"<"
+GREATER_THAN_EQUALTO:">="
+LESS_THAN_EQUALTO:"<="
+EQUALS_TO:"=="
+NOT_EQUALS:"!="
+MINUS:"-"
+AND:"&&"
+OR:"||"
+
+_term: _factor ("*" _factor)*
+
+_factor: STRING
+       | IDENTIFIER
+       | NUMBER
+       | BOOLEAN
+       | "(" expression ")"
+
+
+conditional_statement: "either" condition_block "whatif" condition_block ("or" block | _statement_list)
+                     | "either" condition_block ("or" block | _statement_list)
+
+condition_block: "(" expression ")" block
+
+loop_statement: "while" "(" expression ")" "do" block
+              | "from" range_expression "do" block
+
+range_expression: "(" assignment_statement ";" expression ";" assignment_statement ")"
+
+function_declaration: "func" IDENTIFIER "(" parameters ")" block
+                    | "func" IDENTIFIER "(" ")" block
+
+block: "{" _statement_list "}"
+
+parameters: (parameter ("," parameter)*)?
+
+parameter: IDENTIFIER ":" _var_type ("=" expression)?
+
+function_call: IDENTIFIER "(" _arguments ")" ";"
+
+input_statement: "take" "(" IDENTIFIER ")" ";"
+
+output_statement: "show" "(" _arguments ")" ";"
+
+return_statement: "give" "(" _arguments ")" ";"
+
+_arguments: expression ("," expression)*
+
+try_catch_statement: "try" "{" _statement_list "}" "catch" "(" IDENTIFIER ")" "{" _statement_list "}" "finally" "{" _statement_list "}"
+
+stop_statement: "stop" ";"
+carryon_statement: "carryon" ";"
+
+COMMENT: /->.*\n/
+IDENTIFIER: /[a-zA-Z_][a-zA-Z0-9_]*/
+STRING: /"([^"\\]|\\.)*"/
+BOOLEAN: "on" | "off"
+NUMBER: /\d+/
+
+%import common.WS
+%import common.keywords
+
+
+
+%ignore WS
